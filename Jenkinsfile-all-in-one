@@ -1,19 +1,21 @@
 pipeline {
     agent any
+
     stages {
-        stage('Build Application') {
+        stage('Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
-        stage('Deploy WAR to staging Tomcat') {
+
+        stage('Deploy to Tomcat') {
             steps {
                 script {
                     deploy adapters: [
                         tomcat9(
                             credentialsId: 'tomcat-credentials-id',
                             path: '/',
-                            url: 'http://3.87.53.101:8080'
+                            url: 'http://3.87.53.101:8080/manager/text'
                         )
                     ], contextPath: '/', war: '**/*.war'
                 }

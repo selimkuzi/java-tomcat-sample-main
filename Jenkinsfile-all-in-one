@@ -7,8 +7,7 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
-
-        stage('Deploy to Tomcat') {
+        stage('Deploy to Staging Tomcat') {
             steps {
                 script {
                     deploy adapters: [
@@ -16,6 +15,22 @@ pipeline {
                             credentialsId: 'tomcat-credentials-id',
                             path: '/',
                             url: 'http://3.87.53.101:8080/manager/text'
+                        )
+                    ], contextPath: '/', war: '**/*.war'
+                }
+            }
+        }
+        stage('Deploy to Prod Tomcat') {
+            steps {
+                timeout(time:5, unit:'DAYS'){
+                    input message:'Approve PRODUCTION Deployment?'
+                }
+                script {
+                    deploy adapters: [
+                        tomcat9(
+                            credentialsId: 'tomcat-credentials-id',
+                            path: '/',
+                            url: 'http://54.172.25.216:8080/manager/text'
                         )
                     ], contextPath: '/', war: '**/*.war'
                 }
